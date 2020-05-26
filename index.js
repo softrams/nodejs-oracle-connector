@@ -101,7 +101,7 @@ exports.execute = async (srcName, query, params = {}, options = {}) => {
     );
 
     await conn.close();
-    return result.rows;
+    return result;
   } catch (err) {
     console.error("Oracle Adapter: Error while executing query", err);
     throw new Error(err.message);
