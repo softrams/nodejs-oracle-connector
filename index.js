@@ -6,11 +6,10 @@ const oracledb = require("oracledb");
 
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
 
-// #region PRIVATE
 let pools = {};
 let config = {};
 
-createPool = async (poolName) => {
+exports.createPool = async (poolName) => {
   try {
     const srcCfg = config.DATASOURCES[poolName];
     if (srcCfg) {
@@ -32,7 +31,7 @@ createPool = async (poolName) => {
   }
 };
 
-connect = async (poolName) => {
+exports.connect = async (poolName) => {
   try {
     if (!pools[poolName]) {
       await this.createPool(poolName);
@@ -48,7 +47,7 @@ connect = async (poolName) => {
   }
 };
 
-close = async (conn) => {
+exports.close = async (conn) => {
   if (conn) {
     try {
       await conn.close();
@@ -63,7 +62,7 @@ close = async (conn) => {
   }
 };
 
-closePool = async (poolAlias) => {
+exports.closePool = async (poolAlias) => {
   try {
     await oracledb.getPool(poolAlias).close(10);
     console.info(`Oracle Adapter: Pool ${poolAlias} closed`);
@@ -73,10 +72,6 @@ closePool = async (poolAlias) => {
     return false;
   }
 };
-
-// #endregion
-
-// #region PUBLIC
 
 exports.init = async (cfg) => {
   config = cfg;
@@ -127,5 +122,3 @@ exports.closeAllPools = async () => {
     return false;
   }
 };
-
-// #endregion
