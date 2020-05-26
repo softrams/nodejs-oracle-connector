@@ -1,6 +1,6 @@
 {
   "name": "@softrams/nodejs-oracle-connector",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Database connector wrapper to work with Oracle database from nodejs applications",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,7 @@
     "Oracle",
     "Database"
   ],
-  "author": "Murali Mallina (murali@softrams.com)",
+  "author": "Murali (murali@softrams.com)",
   "license": "UNLICENSED",
   "bugs": {
     "url": "https://github.com/softrams/nodejs-oracle-connector/issues"
