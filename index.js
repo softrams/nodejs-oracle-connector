@@ -78,6 +78,7 @@ exports.init = async (cfg) => {
 };
 
 exports.execute = async (srcName, query, params = {}, options = {}) => {
+  let result;
   try {
     console.debug(query);
     if (params) {
@@ -89,22 +90,22 @@ exports.execute = async (srcName, query, params = {}, options = {}) => {
 
     console.debug(
       `Oracle Adapter: Connection secured: ${process.hrtime(start)[0]}s ${
-        process.hrtime(start)[1] / 1000000
+      process.hrtime(start)[1] / 1000000
       }ms`
     );
-    const result = await conn.execute(query, params, options);
+    result = await conn.execute(query, params, options);
 
     console.debug(
       `Oracle Adapter: Query executed: ${process.hrtime(start)[0]}s ${
-        process.hrtime(start)[1] / 1000000
+      process.hrtime(start)[1] / 1000000
       }ms`
     );
-
-    await conn.close();
-    return result;
   } catch (err) {
     console.error("Oracle Adapter: Error while executing query", err);
     throw new Error(err.message);
+  } finally {
+    await conn.close();
+    return result;
   }
 };
 
@@ -120,5 +121,60 @@ exports.closeAllPools = async () => {
   } catch (err) {
     console.error("Oracle Adapter: Error while closing connection", err);
     return false;
+  }
+};
+
+/**
+ * create a new standalone, non-pooled query and executes query using
+ * the datasource based on the source name provided
+ *
+ * @param {string} sourceName - provide the data source name to be used. It should be
+ * one match one of the datasources set in the express.config file
+ * @param {string} query - provide the query to be executed
+ * @param {object} params - provide the bindings used in the query
+ * @param {object} options - provide oracleDB.ExecuteOptions
+ */
+exports.executeStandaloneConnection = async (
+  sourceName,
+  query,
+  params = {},
+  options = {}
+) => {
+  const srcCfg = config.DATASOURCES[sourceName];
+  if (!srcCfg) {
+    console.error(`Oracle Adapter: Missing configuration for ${sourceName}`);
+    return false;
+  }
+
+  const connection = await oracledb.getConnection({
+    user: config.DATASOURCES[sourceName].DB_USER,
+    password: config.DATASOURCES[sourceName].DB_PASSWORD,
+    connectString: `${srcCfg.DB_HOST}:${srcCfg.DB_PORT}/${srcCfg.DB_DATABASE}`,
+
+    connectString: `${config.DATASOURCES[sourceName].DB_HOST}:${config.DATASOURCES[sourceName].DB_PORT}/${config.DATASOURCES[sourceName].DB_DATABASE}`,
+  });
+  const start = process.hrtime();
+
+  let result;
+
+  console.debug(
+    `Oracle Adapter: Connection secured: ${process.hrtime(start)[0]}s ${
+    process.hrtime(start)[1] / 1000000
+    }ms`
+  );
+
+  try {
+    result = await connection.execute(query, params, options);
+
+    console.debug(
+      `Oracle Adapter: Query executed: ${process.hrtime(start)[0]}s ${
+      process.hrtime(start)[1] / 1000000
+      }ms`
+    );
+  } catch (ex) {
+    console.info(`Oracle Adapter: There was an error at the moment of executing oracle query using a standalone connection: ${JSON.stringify(ex)}`);
+  } finally {
+    await connection.close();
+    return result;
   }
 };
