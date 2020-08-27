@@ -147,11 +147,9 @@ exports.executeStandaloneConnection = async (
   }
 
   const connection = await oracledb.getConnection({
-    user: config.DATASOURCES[sourceName].DB_USER,
-    password: config.DATASOURCES[sourceName].DB_PASSWORD,
-    connectString: `${srcCfg.DB_HOST}:${srcCfg.DB_PORT}/${srcCfg.DB_DATABASE}`,
-
-    connectString: `${config.DATASOURCES[sourceName].DB_HOST}:${config.DATASOURCES[sourceName].DB_PORT}/${config.DATASOURCES[sourceName].DB_DATABASE}`,
+    user: srcCfg.DB_USER,
+    password: srcCfg.DB_PASSWORD,
+    connectString: `${srcCfg.DB_HOST}:${srcCfg.DB_PORT}/${srcCfg.DB_DATABASE}`
   });
   const start = process.hrtime();
 
