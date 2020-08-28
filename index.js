@@ -79,6 +79,7 @@ exports.init = async (cfg) => {
 
 exports.execute = async (srcName, query, params = {}, options = {}) => {
   let result;
+  let conn;
   try {
     console.debug(query);
     if (params) {
@@ -86,7 +87,7 @@ exports.execute = async (srcName, query, params = {}, options = {}) => {
     }
 
     const start = process.hrtime();
-    const conn = await this.connect(srcName);
+    conn = await this.connect(srcName);
 
     console.debug(
       `Oracle Adapter: Connection secured: ${process.hrtime(start)[0]}s ${
@@ -100,12 +101,13 @@ exports.execute = async (srcName, query, params = {}, options = {}) => {
       process.hrtime(start)[1] / 1000000
       }ms`
     );
+
+    return result;
   } catch (err) {
     console.error("Oracle Adapter: Error while executing query", err);
     throw new Error(err.message);
   } finally {
     await conn.close();
-    return result;
   }
 };
 
