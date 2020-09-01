@@ -49,3 +49,5 @@ combined.log
 database.log
 perf.log
 http.log
+
+test.js

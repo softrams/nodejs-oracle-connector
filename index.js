@@ -6,6 +6,10 @@ const oracledb = require("oracledb");
 
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
 
+const POOL_MAX_DEFAULT = 4;
+const POOL_MIN_DEFAULT = 0;
+const POOL_INCREMENT_DEFAULT = 1;
+
 let pools = {};
 let config = {};
 
@@ -13,11 +17,28 @@ exports.createPool = async (poolName) => {
   try {
     const srcCfg = config.DATASOURCES[poolName];
     if (srcCfg) {
+      let poolMax = POOL_MAX_DEFAULT;
+      let poolMin = POOL_MIN_DEFAULT;
+      let poolIncrement = POOL_INCREMENT_DEFAULT;
+
+      if (process.env.UV_THREADPOOL_SIZE && srcCfg.MAX_POOL && !isNaN(srcCfg.MAX_POOL)) {
+        // if a max pool is provided, make sure to set poolMin equal to poolMax, as well as
+        // the poolIncrement to zero, based on oracledb documentation to prevent any 
+        // kind of connection storms. 
+        // For more info, checkout https://oracle.github.io/node-oracledb/doc/api.html#-1531-connection-pool-sizing
+        poolMax = srcCfg.MAX_POOL;
+        poolMin = srcCfg.MAX_POOL;
+        poolIncrement = 0;
+      }
+
       pools[poolName] = await oracledb.createPool({
         poolAlias: poolName,
         user: srcCfg.DB_USER,
         password: srcCfg.DB_PASSWORD,
         connectString: `${srcCfg.DB_HOST}:${srcCfg.DB_PORT}/${srcCfg.DB_DATABASE}`,
+        poolMax,
+        poolMin,
+        poolIncrement
       });
       console.debug(`Oracle Adapter: Pool ${poolName} created`);
       return true;
