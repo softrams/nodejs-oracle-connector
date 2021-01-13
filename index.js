@@ -10,6 +10,7 @@ const POOL_MAX_DEFAULT = 4;
 const POOL_MIN_DEFAULT = 0;
 const POOL_INCREMENT_DEFAULT = 1;
 
+let promises = {};
 let pools = {};
 let config = {};
 
@@ -23,23 +24,26 @@ exports.createPool = async (poolName) => {
 
       if (process.env.UV_THREADPOOL_SIZE && srcCfg.MAX_POOL && !isNaN(srcCfg.MAX_POOL)) {
         // if a max pool is provided, make sure to set poolMin equal to poolMax, as well as
-        // the poolIncrement to zero, based on oracledb documentation to prevent any 
-        // kind of connection storms. 
+        // the poolIncrement to zero, based on oracledb documentation to prevent any
+        // kind of connection storms.
         // For more info, checkout https://oracle.github.io/node-oracledb/doc/api.html#-1531-connection-pool-sizing
         poolMax = srcCfg.MAX_POOL;
         poolMin = srcCfg.MAX_POOL;
         poolIncrement = 0;
       }
 
-      pools[poolName] = await oracledb.createPool({
-        poolAlias: poolName,
-        user: srcCfg.DB_USER,
-        password: srcCfg.DB_PASSWORD,
-        connectString: `${srcCfg.DB_HOST}:${srcCfg.DB_PORT}/${srcCfg.DB_DATABASE}`,
-        poolMax,
-        poolMin,
-        poolIncrement
-      });
+      if (!promises[poolName]) {
+        promises[poolName] = oracledb.createPool({
+          poolAlias: poolName,
+          user: srcCfg.DB_USER,
+          password: srcCfg.DB_PASSWORD,
+          connectString: `${srcCfg.DB_HOST}:${srcCfg.DB_PORT}/${srcCfg.DB_DATABASE}`,
+          poolMax,
+          poolMin,
+          poolIncrement
+        });
+      }
+      pools[poolName] = await promises[poolName];
       console.debug(`Oracle Adapter: Pool ${poolName} created`);
       return true;
     } else {
@@ -135,6 +139,7 @@ exports.execute = async (srcName, query, params = {}, options = {}) => {
 exports.closeAllPools = async () => {
   try {
     const tempPools = pools;
+    promises = {};
     pools = {};
     for (const poolAlias of Object.keys(tempPools)) {
       await oracledb.getPool(poolAlias).close(10);
