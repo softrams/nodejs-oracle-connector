@@ -74,7 +74,7 @@ exports.close = async (conn) => {
   if (conn) {
     try {
       await conn.close();
-      console.info("Oracle Adapter: DB connection returned to pool");
+      console.debug("Oracle Adapter: DB connection returned to pool");
       return true;
     } catch (err) {
       console.error("Oracle Adapter: Error while closing connection", err);
@@ -88,7 +88,7 @@ exports.close = async (conn) => {
 exports.closePool = async (poolAlias) => {
   try {
     await oracledb.getPool(poolAlias).close(10);
-    console.info(`Oracle Adapter: Pool ${poolAlias} closed`);
+    console.debug(`Oracle Adapter: Pool ${poolAlias} closed`);
     return true;
   } catch (err) {
     console.error("Oracle Adapter: Error while closing connection", err);
@@ -141,7 +141,7 @@ exports.closeAllPools = async () => {
     pools = {};
     for (const poolAlias of Object.keys(tempPools)) {
       await oracledb.getPool(poolAlias).close(10);
-      console.info(`Oracle Adapter: Pool ${poolAlias} closed`);
+      console.debug(`Oracle Adapter: Pool ${poolAlias} closed`);
     }
     return true;
   } catch (err) {
@@ -196,7 +196,7 @@ exports.executeStandaloneConnection = async (
       }ms`
     );
   } catch (ex) {
-    console.info(`Oracle Adapter: There was an error at the moment of executing oracle query using a standalone connection: ${JSON.stringify(ex)}`);
+    console.error(`Oracle Adapter: There was an error at the moment of executing oracle query using a standalone connection: ${JSON.stringify(ex)}`);
   } finally {
     await connection.close();
     return result;
