@@ -62,9 +62,7 @@ exports.connect = async (poolName) => {
       await this.createPool(poolName);
     }
     const connection = await oracledb.getConnection(poolName);
-    console.info(
-      `Oracle Adapter: Successfully retrieved a connection from ${poolName} pool`
-    );
+    console.debug(`Oracle Adapter: Successfully retrieved a connection from ${poolName} pool`);
     return connection;
   } catch (err) {
     console.error("Oracle Adapter: Error while retrieving a connection", err);
