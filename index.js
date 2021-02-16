@@ -126,6 +126,8 @@ exports.execute = async (srcName, query, params = {}, options = {}) => {
       process.hrtime(start)[1] / 1000000
       }ms`
     );
+    // to get the text from columns of type CLOB
+    oracledb.fetchAsString = [ oracledb.CLOB ];
     result = await conn.execute(query, params, options);
 
     console.debug(
