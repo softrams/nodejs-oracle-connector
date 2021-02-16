@@ -14,6 +14,15 @@ let promises = {};
 let pools = {};
 let config = {};
 
+/**
+ * OracleDB Parameter types
+ */
+exports.OracleDBTypes = {
+  STRING: oracledb.STRING,
+  NUMBER: oracledb.NUMBER,
+  DATE: oracledb.DATE
+};
+
 exports.createPool = async (poolName) => {
   try {
     const srcCfg = config.DATASOURCES[poolName];
@@ -118,6 +127,47 @@ exports.execute = async (srcName, query, params = {}, options = {}) => {
       }ms`
     );
     result = await conn.execute(query, params, options);
+
+    console.debug(
+      `Oracle Adapter: Query executed: ${process.hrtime(start)[0]}s ${
+      process.hrtime(start)[1] / 1000000
+      }ms`
+    );
+
+    return result;
+  } catch (err) {
+    console.error("Oracle Adapter: Error while executing query", err);
+    throw new Error(err.message);
+  } finally {
+    await conn.close();
+  }
+};
+
+/**
+ * Execute multiple inserts in batch
+ * @param {*} srcName 
+ * @param {*} query 
+ * @param {*} binds 
+ * @param {*} options 
+ */
+exports.executeMany = async (srcName, query, binds = [], options = {}) => {
+  let result;
+  let conn;
+  try {
+    console.debug(query);
+    if (binds) {
+      console.debug(JSON.stringify(binds));
+    }
+
+    const start = process.hrtime();
+    conn = await this.connect(srcName);
+
+    console.debug(
+      `Oracle Adapter: Connection secured: ${process.hrtime(start)[0]}s ${
+      process.hrtime(start)[1] / 1000000
+      }ms`
+    );
+    result = await conn.executeMany(query, binds, options);
 
     console.debug(
       `Oracle Adapter: Query executed: ${process.hrtime(start)[0]}s ${
