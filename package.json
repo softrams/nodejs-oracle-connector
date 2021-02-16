@@ -4,7 +4,9 @@
   "description": "Database connector wrapper to work with Oracle database from nodejs applications",
   "main": "index.js",
   "scripts": {
-    "test": "yarn test"
+    "test": "yarn test",
+    "version:patch": "npm version patch",
+    "publish": "npm publish"
   },
   "repository": {
     "type": "git",
