@@ -144,11 +144,23 @@ exports.execute = async (srcName, query, params = {}, options = {}) => {
 };
 
 /**
- * Execute multiple inserts in batch
- * @param {*} srcName 
- * @param {*} query 
- * @param {*} binds 
- * @param {*} options 
+ * 
+ * @param {*} srcName - Connection name to connect to DB 
+ * @param {*} query - SQL Query to execute. Example: 
+ *                      INSERT INTO TABLE1 (ID, NAME) VALUES (:id, :name)
+ * @param {*} binds - Array of objects whose keys match the bind variable names in the SQL statement. For Example: 
+ *                      [
+ *                        {id:1,name: name1},
+ *                        {id:2,name: name2}
+ *                      ]
+ * @param {*} options - It is an optional parameter contains following properties:
+ *                      1. autoCommit
+ *                      2. batchErrors - call will stop when first error occurs
+ *                      3. bindDefs - object defines the bind variable types, sizes and directions. Example:
+ *                          bindDefs: {
+ *                            id: { type: dataSource.OracleDBTypes.NUMBER, maxSize: 5 },
+ *                             name: { type: dataSource.OracleDBTypes.STRING, maxSize: 10 }
+ *                           }
  */
 exports.executeMany = async (srcName, query, binds = [], options = {}) => {
   let result;
