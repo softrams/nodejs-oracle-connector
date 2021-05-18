@@ -198,6 +198,44 @@ exports.executeMany = async (srcName, query, binds = [], options = {}) => {
   }
 };
 
+exports.executeStoredProc = async (srcName, storeproc, params = {}, options = {}) => {
+  let result;
+  let conn;
+  let rows = [];
+  try {
+  console.debug(storeproc);
+    if (params) {
+      console.debug(JSON.stringify(params));
+    }
+    const start = process.hrtime();
+    conn = await this.connect(srcName);
+    console.debug(
+      `Oracle Adapter: Connection secured: ${process.hrtime(start)[0]}s ${
+      process.hrtime(start)[1] / 1000000
+      }ms`
+    );
+    result = await conn.execute(
+      storeproc, params
+    );
+    console.debug(
+      `Oracle Adapter: Query executed: ${process.hrtime(start)[0]}s ${
+      process.hrtime(start)[1] / 1000000
+      }ms`
+    );
+    const resultSet = result.outBinds.response;
+    let row;
+    while ((row = await resultSet.getRow())) {
+      rows.push(row);
+    }
+  } catch (err) {
+    console.error("Oracle Adapter: Error while executing query", err);
+    throw new Error(err.message);
+  } finally {
+     await conn.close();
+     return rows;
+  }
+};
+
 exports.closeAllPools = async () => {
   try {
     const tempPools = pools;
