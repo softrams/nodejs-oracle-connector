@@ -1,6 +1,6 @@
 {
   "name": "@softrams/nodejs-oracle-connector",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Database connector wrapper to work with Oracle database from nodejs applications",
   "main": "index.js",
   "scripts": {
