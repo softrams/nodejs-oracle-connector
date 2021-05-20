@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "yarn test",
-    "version:patch": "npm version patch",
+    "version": "semantic-release",
     "publish": "npm publish"
   },
   "repository": {
@@ -25,5 +25,12 @@
   "homepage": "https://github.com/softrams/nodejs-oracle-connector#readme",
   "dependencies": {
     "oracledb": "^4.2.0"
+  },
+  "devDependencies": {
+    "semantic-release": "^17.3.9"
+  },
+  "publishConfig": {
+    "access": "public",
+    "branches": ["master"]
   }
 }
