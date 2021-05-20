@@ -4,7 +4,9 @@
   "description": "Database connector wrapper to work with Oracle database from nodejs applications",
   "main": "index.js",
   "scripts": {
-    "test": "yarn test"
+    "test": "yarn test",
+    "version": "semantic-release",
+    "publish": "npm publish"
   },
   "repository": {
     "type": "git",
@@ -23,5 +25,12 @@
   "homepage": "https://github.com/softrams/nodejs-oracle-connector#readme",
   "dependencies": {
     "oracledb": "^4.2.0"
+  },
+  "devDependencies": {
+    "semantic-release": "^17.3.9"
+  },
+  "publishConfig": {
+    "access": "public",
+    "branches": ["master"]
   }
 }
