@@ -141,7 +141,7 @@ exports.execute = async (srcName, query, params = {}, options = {}) => {
     console.error("Oracle Adapter: Error while executing query", err);
     throw new Error(err.message);
   } finally {
-    await conn.close();
+    if (conn) await conn.close();
   }
 };
 
@@ -194,7 +194,7 @@ exports.executeMany = async (srcName, query, binds = [], options = {}) => {
     console.error("Oracle Adapter: Error while executing query", err);
     throw new Error(err.message);
   } finally {
-    await conn.close();
+    if (conn) await conn.close();
   }
 };
 
@@ -231,7 +231,7 @@ exports.executeStoredProc = async (srcName, storeproc, params = {}, options = {}
     console.error("Oracle Adapter: Error while executing query", err);
     throw new Error(err.message);
   } finally {
-     await conn.close();
+     if (conn) await conn.close();
      return rows;
   }
 };
@@ -300,7 +300,7 @@ exports.executeStandaloneConnection = async (
   } catch (ex) {
     console.error(`Oracle Adapter: There was an error at the moment of executing oracle query using a standalone connection: ${JSON.stringify(ex)}`);
   } finally {
-    await connection.close();
+    if (connection) await connection.close();
     return result;
   }
 };
