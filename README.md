@@ -20,3 +20,9 @@ If you wish to use NVM to maintain parallel Node installations, ensure that it d
 ## References
 
 - https://oracle.github.io/node-oracledb/INSTALL.html#quickstart
+
+### Changelog
+
+# v1.0.2
+Added auto drop and create pool when getting connection timedout
+to fix NJS-040 issue.
