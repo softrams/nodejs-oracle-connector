@@ -65,7 +65,13 @@ exports.createPool = async (poolName) => {
   }
 };
 
-exports.connect = async (poolName, retryCount = 0) => {
+/**
+ * 
+ * @param {string} poolName Connection pool name/alias
+ * @param {number} retryCount Amount of retries. Default = 2
+ * @returns {oracledb.Connection}
+ */
+exports.connect = async (poolName, retryCount = 2) => {
   try {
     if (!pools[poolName]) {
       await this.createPool(poolName);
@@ -74,14 +80,14 @@ exports.connect = async (poolName, retryCount = 0) => {
     console.debug(`Oracle Adapter: Successfully retrieved a connection from ${poolName} pool`);
     return connection;
   } catch (err) {
-    if (JSON.stringify(err).includes('NJS-040') && retryCount <= 2) {
+    if (JSON.stringify(err).includes('NJS-040') && retryCount >= 0) {
       console.error(`Oracle Adapter: Getting pool(${poolAlias}) connection timedout.`);
       promises = {};
       pools = {};
       console.debug(`Oracle Adapter: Closing pool ${poolAlias}.`);
       await oracledb.getPool(poolName).close(0);
       console.debug(`Oracle Adapter: Retrying to connect to ${poolAlias}.`);
-      return this.connect(poolName, retryCount + 1);
+      return this.connect(poolName, retryCount - 1);
     }
     console.error("Oracle Adapter: Error while retrieving a connection", err);
     throw new Error(err.message);
